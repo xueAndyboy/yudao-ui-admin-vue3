@@ -1,0 +1,31 @@
+name: Yudao-UI-Admin-Vue3 Local CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          clean: false
+
+      - name: Deploy Frontend
+        run: |
+          echo "==== 开始部署最新前端代码 ===="
+          # 将构建上下文指定为当前运行器检出的最新代码目录
+          export FRONTEND_BUILD_CONTEXT="$(pwd)"
+          
+          # 进入 compose 目录执行容器重建
+          cd /home/yeeco/ruoyi-vue-pro
+          docker compose -p ruoyi-vue-pro up -d --build admin
+          
+          # 清理虚悬镜像
+          docker image prune -f
+          echo "==== 前端部署成功 ===="
